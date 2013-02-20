@@ -1,0 +1,13 @@
+ent1, ent3, ent8 have shape circ
+ent1, ent4, ent5, ent6, ent8 have color blu
+ent4, ent5, ent7 have shape tri
+ent2, ent3, ent7 have color red
+ent2, ent3, ent6 have shape oct
+
+structure scene1 has pos1 ent1, pos2 ent2, pos3 ent3, pos4 ent4
+structure scene2 has pos1 ent5, pos2 ent6, pos3 ent7, pos4 ent8
+
+
+compare(scene1, scene2) 
+
+brain

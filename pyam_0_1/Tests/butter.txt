@@ -1,0 +1,15 @@
+butter1 has head tri, wings brick, body brick, tail radiating
+butter2 has head square, wings checker, body checker, tail zigzag
+
+butter3 has head tri, wings brick, body brick, tail radiating
+butter4 has head m, wings speck, body speck, tail lineball
+
+
+structure scene1 has pos1 butter1, pos2 butter2
+structure scene2 has pos1 butter3, pos2 butter4
+
+compare(scene1,scene2)
+
+#brain
+
+#objects should not identify role nodes that do not involve them as either con or inc

@@ -1,0 +1,13 @@
+ent1 has shape diamond, color red
+ent2 has shape circle, color black
+ent3 has shape diamond, color blue
+ent4 has shape circle, color red
+
+structure scene1 has pos1 ent1, pos2 ent2
+structure scene2 has pos1 ent3, pos2 ent4
+
+compare(scene1,scene2)
+
+#brain
+
+#objects should not identify role nodes that do not involve them as either con or inc
