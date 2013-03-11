@@ -24,20 +24,27 @@ def makeComparison(fieldnames,line):
     fieldNum = 1
     entNumber = 1
     structName = "structure1"
+    meta = False
     for field in fieldnames[3:]:
-        if field in entity or field == 'line':
-            name = "ent" + str(entNumber)
-            script.append(makeEnt(entity,name))
-            ents.append(name)
-            entNumber+=1
-            entity = {}
-            fieldNum+=1
-        if field == 'line':
-            script.append(makeStruct(ents,structName))
-            structName = "structure2"
-            ents = []
+        if meta:
+            comparison['metadata'][field]=line[field]
         else:
-            entity[field] = line[field+str(fieldNum)]
+            if field in entity or field == 'line':
+                name = "ent" + str(entNumber)
+                script.append(makeEnt(entity,name))
+                ents.append(name)
+                entNumber+=1
+                entity = {}
+                fieldNum+=1
+            if field == 'line':
+                script.append(makeStruct(ents,structName))
+                structName = "structure2"
+                ents = []
+            else:
+                if field == 'meta':
+                    meta = True
+                else:
+                    entity[field] = line[field+str(fieldNum)]
     
     name = "ent" + str(entNumber)
     script.append(makeEnt(entity,name))

@@ -321,9 +321,6 @@ def terminal():
     import ply.yacc as yacc
     yacc.yacc()
 
-    print 
-    print
-
     while 1:
         try:
             s = read_line("> ")
