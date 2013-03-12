@@ -1,11 +1,23 @@
-if(Sys.info()["sysname"]=="Windows"){
-  setwd("C:\\Users\\Gage\\Desktop\\Pyam\\pyam_0_1")
-  Windows <- TRUE 
-}else{
-  setwd("/Users/gageholden/Desktop/Pyam/pyam_0_1")
+if(Sys.info()["effective_user"]=="dlandy"){
+  setwd("/Users/dlandy/programs/Pyam/pyam_0_1")
   Windows <- FALSE
+} else {
+  if(Sys.info()["sysname"]=="Windows"){
+    setwd("C:\\Users\\Gage\\Desktop\\Pyam\\pyam_0_1")
+    Windows <- TRUE 
+  }else{
+    setwd("/Users/gageholden/Desktop/Pyam/pyam_0_1")
+    Windows <- FALSE
+  }
 }
+<<<<<<< HEAD
 inducePyam <- function(pyamScript,parameterString=""){
+=======
+
+inducePyam <- function(pyamScript,L=0.5,R=5,S=1){
+  #print(environment())
+  #print(as.list(environment()))
+>>>>>>> Extended to allow my use.
   induce <- "python ./Induce.py"
   test <- paste(unlist(pyamScript), collapse="\n")
   command<-paste(induce,parameterString)
