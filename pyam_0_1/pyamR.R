@@ -10,14 +10,9 @@ if(Sys.info()["effective_user"]=="dlandy"){
     Windows <- FALSE
   }
 }
-<<<<<<< HEAD
 inducePyam <- function(pyamScript,parameterString=""){
-=======
 
-inducePyam <- function(pyamScript,L=0.5,R=5,S=1){
-  #print(environment())
-  #print(as.list(environment()))
->>>>>>> Extended to allow my use.
+#inducePyam <- function(pyamScript,L=0.5,R=5,S=1){
   induce <- "python ./Induce.py"
   test <- paste(unlist(pyamScript), collapse="\n")
   command<-paste(induce,parameterString)
