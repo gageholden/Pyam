@@ -5,12 +5,10 @@ if(Sys.info()["sysname"]=="Windows"){
   setwd("/Users/gageholden/Desktop/Pyam/pyam_0_1")
   Windows <- FALSE
 }
-inducePyam <- function(pyamScript,L=0.5,R=5,S=1){
-  #print(environment())
-  #print(as.list(environment()))
+inducePyam <- function(pyamScript,parameterString=""){
   induce <- "python ./Induce.py"
   test <- paste(unlist(pyamScript), collapse="\n")
-  command<-paste(induce,"-l",L,"-r",R,"-s",S)
+  command<-paste(induce,parameterString)
   #print(command)
   system(command, intern = TRUE, input = test)
   #as.numeric(system(command, intern = TRUE))
@@ -40,16 +38,22 @@ fromPyam <- function(filename){
 }
 
 getSimilarity <- function(comparison,parameters){
-  comparison$similarity$value <- as.numeric(inducePyam(comparison[['script']])[[1]])
-  #comparison$similarity$parameters <- parameters
-  #print(parameters)
-  comparison
+  run = list("parameters"=parameters,"metadata"=comparison$metadata,
+             "script"=comparison$script)
+  parameterString <- paste("-",names(parameters)," ",parameters,sep="",collapse=" ")
+  run$similarity <- as.numeric(inducePyam(comparison[['script']],parameterString)[[1]])
+  run
 }
 
-similaritiesFromCSV <- function(filename,start=-1,end=-1,parameters = list()){
+similaritiesFromCSV <- function(filename,start=-1,end=-1,parametersIn = list()){
   comparisons <- fromCSV(filename, start,end)
-  comparisons <- lapply(comparisons,parameters=list("L"=1,"R"=2,"S"=3),getSimilarity)
+  comparisons <- lapply(comparisons,parameters=parametersIn,getSimilarity)
   comparisons
 }
 
 myTempFilename = "./data/StimuliLarkey_mips.csv"
+
+interestingPlot <- function(){
+  runtest = lapply(1:20,function(x){similaritiesFromCSV(myTempFilename,start=1,end=1,parametersIn=list("r"=x, "l"=0.2))})
+  plot(cbind(lapply(runtest,function(x){x[[1]]$parameters$r}),lapply(runtest,function(x){x[[1]]$similarity})),xlab="Rounds",ylab="Similarity")
+}
