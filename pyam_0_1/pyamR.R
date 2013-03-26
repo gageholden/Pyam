@@ -1,4 +1,4 @@
-if(Sys.info()["effective_user"]=="dlandy"){
+if(Sys.info()["user"]=="dlandy"){
   setwd("/Users/dlandy/programs/Pyam/pyam_0_1")
   Windows <- FALSE
 } else {
@@ -16,11 +16,8 @@ inducePyam <- function(pyamScript,parameterString=""){
   induce <- "python ./Induce.py"
   test <- paste(unlist(pyamScript), collapse="\n")
   command<-paste(induce,parameterString)
-  #print(command)
-  system(command, intern = TRUE, input = test)
-  #as.numeric(system(command, intern = TRUE))
   
-  #data.frame(sim=c)
+  system(command, intern = TRUE, input = test)
 }
 
 fromCSV <- function(filename, start, end){
@@ -54,13 +51,23 @@ getSimilarity <- function(comparison,parameters){
 
 similaritiesFromCSV <- function(filename,start=-1,end=-1,parametersIn = list()){
   comparisons <- fromCSV(filename, start,end)
-  comparisons <- lapply(comparisons,parameters=parametersIn,getSimilarity)
+  comparisons <- lapply(comparisons,getSimilarity, parameters=parametersIn)
   comparisons
 }
 
 myTempFilename = "./data/StimuliLarkey_mips.csv"
 
-interestingPlot <- function(){
-  runtest = lapply(1:20,function(x){similaritiesFromCSV(myTempFilename,start=1,end=1,parametersIn=list("r"=x, "l"=0.2))})
-  plot(cbind(lapply(runtest,function(x){x[[1]]$parameters$r}),lapply(runtest,function(x){x[[1]]$similarity})),xlab="Rounds",ylab="Similarity")
+makeGraph <- function(comparisons,xAxis,yAxis,xMeta = FALSE, yMeta = FALSE){
+  if(yMeta && xMeta)
+    plot(cbind(lapply(comparisons,function(x){x$metadata[[xAxis]]}),lapply(comparisons,function(x){x$metadata[[yAxis]]})),xlab=xAxis,ylab=yAxis)
+  else if(xMeta)
+    plot(cbind(lapply(comparisons,function(x){x$metadata[[xAxis]]}),lapply(comparisons,function(x){x[[yAxis]]})),xlab=xAxis,ylab=yAxis)
+  else if(yMeta)
+    plot(cbind(lapply(comparisons,function(x){x[[xAxis]]}),lapply(comparisons,function(x){x$metadata[[yAxis]]})),xlab=xAxis,ylab=yAxis)
+  else
+    plot(cbind(lapply(comparisons,function(x){x[[xAxis]]}),lapply(comparisons,function(x){x[[yAxis]]})),xlab=xAxis,ylab=yAxis)
+}
+
+getData <- function(){
+  unlist(lapply(1:20,function(x){similaritiesFromCSV(myTempFilename,start=1,end=10,parametersIn=list("r"=x, "l"=0.2))}),recursive = F)
 }
