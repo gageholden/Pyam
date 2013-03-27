@@ -165,7 +165,6 @@ def excite(node, value, matchvalue):
         else: Rji = Ai - Ai*(0.5-Aj)
         delta = Rji     # * matchvalue[nd]
         sum_top += delta
-        #print delta
         sum_bot += 1
         if outputSettings['match']: print "  Getting " + str(delta) + " from node " + str(nd)
     for nd in node.inc:
@@ -173,10 +172,10 @@ def excite(node, value, matchvalue):
         if (1-Aj) >= 0.5:
             Rji = Ai+(1-Ai)*((1-Aj) - 0.5)
         else: Rji = Ai - Ai*(0.5-(1-Aj))
-        delta = Rji     # * matchvalue[nd]
+        weight = determineWeight()
+        delta = Rji # * weight
         sum_top += delta
-        #print delta
-        sum_bot += 1
+        sum_bot += 1 # * weight
         if outputSettings['match']: print "  Losing  " + str(delta) + " from node " + str(nd)
     # Of course, features might match
     if(node.type == "Feature" or node.type=="Role"):
@@ -185,12 +184,11 @@ def excite(node, value, matchvalue):
         if outputSettings['match']: print "  Getting " + str(matchvalue[node.index]) + " from matchvalue"
     
 
-    #print
-    #print "Mi!" + str(sum_top/sum_bot)
     Mi = sum_top/sum_bot
-#    return Ai + L*Mi
+
     returnable = Ai*(1-L)+L*Mi
     if returnable < 0: return 0
     return returnable
 
-
+def determineWeight():
+    return

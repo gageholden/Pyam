@@ -17,6 +17,7 @@ def makeEnt(entity, name):
 
 def makeComparison(fieldnames,line):
     comparison={'metadata':{'itemNumber':line['itemNumber'], 'block':line['block'],'type':line['type']}}
+    #comparison={'itemNumber':line['itemNumber'], 'block':line['block'],'type':line['type']}
     script = []
     
     ents = []
@@ -28,6 +29,7 @@ def makeComparison(fieldnames,line):
     for field in fieldnames[3:]:
         if meta:
             comparison['metadata'][field]=line[field]
+            #comparison[field]=line[field]
         else:
             if field in entity or field == 'line':
                 name = "ent" + str(entNumber)

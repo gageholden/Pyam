@@ -289,7 +289,6 @@ def induce(fileIn, paramsIn={}, settingsIn={}):
             if not line.isspace():
                 yacc.parse(line)
             line = fyle.readline()
-        print('\a')
 
 def terminal():
     # Define a dictionary: a default set of stuff to do with one keypress
@@ -328,7 +327,6 @@ def terminal():
             break
         if not s: continue
         yacc.parse(s)
-    print('\a')
     
 if __name__ == "__main__":
     terminal()
