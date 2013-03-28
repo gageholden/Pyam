@@ -97,5 +97,5 @@ getData <- function(parameters,startIn=-1,endIn=-1){
   }
 }
 
-par = data.frame("r"=seq(0,10,by=1),"l"=seq(0,1,by=0.1))
+par = data.frame("r"=seq(10,10,by=1),"l"=seq(0.05,1,by=0.05))
 #LOOK AT colwise! plyr!

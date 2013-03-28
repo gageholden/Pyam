@@ -2,6 +2,7 @@ from elements import *
 from mapper import *
 from fancypack.fancystuff import *
 import sys, getopt
+import mapper
 
 params = {'L':1, 'S':1, 'R':5}
 outputSettings = {'node':False, 'hist':False, 'match':False, 'gen':False}
@@ -34,11 +35,12 @@ reserved = {
         'history' : 'HISTORY',
         'nodeinfo' : 'NODEINFO',
         'match' : 'MATCH',
-        'general' : 'GENERAL'
+        'general' : 'GENERAL',
+        'set' : 'SET'        
     }
 
 tokens = ['NAME','OBJNAME','STRNAME','FVNAME','FDNAME','NUMBER', 'EQUALS', 'IMPLIES', 'OR', 'VAR', 'COMMENT',
-    'PRINT_COMMENT'] + reserved.values()
+    'PRINT_COMMENT','PARNAME'] + reserved.values()
 
 literals = ['=','+','-','*','/', '(',')', '<', '>', '^', '!', ',', '?', ':', '[', ']', '{', '}']
 
@@ -59,6 +61,8 @@ def t_ID(t):
         t.type = 'FVNAME'
     elif featdim.has_key(t.value):
         t.type = 'FDNAME'
+    elif params.has_key(t.value):
+        t.type = "PARNAME"
     else:
         t.type = reserved.get(t.value,'NAME')    # Check for reserved words
     if(not(t.type)):
@@ -261,6 +265,18 @@ def p_clear(p):
 def p_quit(p):
     """statement : QUIT"""
     sys.exit()
+    
+def p_set(p): #I should be able to add a more specific name list with relative ease, afaik
+    """statement : SET PARNAME NUMBER"""
+    print p[0]
+    print p[1]
+    print p[2]
+    print (p[3]==1)
+    params[p[2]]=p[3]
+    print params
+    print mapper.params
+    
+    
     
 def command(command):
     import ply.yacc as yacc
