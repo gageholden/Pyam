@@ -1,5 +1,5 @@
-from fancypack.fancystuff import *
 quiet = True
+elementParams = {}
 
 class FeaturePair:
     '''Defines a feature dimension feature value pair to be used in an object'''
@@ -74,6 +74,8 @@ class Structure:
 class RoleNode:
     def __init__(self, name_one, name_two, obj_one, obj_two):
         self.type = "Role"
+        self.prev = 0.5
+        
         self.name_one = name_one
         self.name_two = name_two
         self.obj_one = obj_one
@@ -116,6 +118,8 @@ class RoleNode:
 class ObjectNode:
     def __init__(self, name_one, name_two, role1, role2):
         self.type = "Object"
+        self.prev = 0.5
+        
         self.name_one = name_one
         self.name_two = name_two
         self.role1 = role1
@@ -149,6 +153,8 @@ class ObjectNode:
 class FeatureNode:
     def __init__(self, dimension, name_one, name_two, object_one, object_two):
         self.type = "Feature"
+        self.prev = 0.5
+        
         self.name_one = name_one
         self.name_two = name_two
         self.owner_one = object_one
@@ -177,3 +183,9 @@ class FeatureNode:
                     self.con[1].append(i)
                     nodelist[i].con[1].append(step_val)
         self.simpcon = [item for sublist in self.con for item in sublist]
+
+def print_now(string):
+    import sys
+    '''Forces printing now rather than at a "new line"'''
+    sys.stdout.write(string)
+    sys.stdout.flush()

@@ -1,10 +1,6 @@
-from elements import *
-from mapper import *
-from fancypack.fancystuff import *
 import sys, getopt
-import mapper
+import mapper, elements
 
-params = {'L':1, 'S':1, 'R':5}
 outputSettings = {'node':False, 'hist':False, 'match':False, 'gen':False}
 
 featval = {}
@@ -61,7 +57,7 @@ def t_ID(t):
         t.type = 'FVNAME'
     elif featdim.has_key(t.value):
         t.type = 'FDNAME'
-    elif params.has_key(t.value):
+    elif mapper.mapperParams.has_key(t.value):
         t.type = "PARNAME"
     else:
         t.type = reserved.get(t.value,'NAME')    # Check for reserved words
@@ -140,11 +136,11 @@ def p_objectplus(p):
     if(len(p)==2):
         p[0] = [p[1]]
         if not objects.has_key(p[1]):
-            objects.setdefault(p[1],Object(p[1]))
+            objects.setdefault(p[1],elements.Object(p[1]))
     else:
         p[0] = [p[1]] + p[3]
         if not objects.has_key(p[1]):
-            objects.setdefault(p[1],Object(p[1]))
+            objects.setdefault(p[1],elements.Object(p[1]))
 
 def p_featurepairplus(p):
     """featurepairplus : featurepair ',' featurepairplus
@@ -160,7 +156,7 @@ def p_featurepair(p):
                     | NAME FDNAME
                     | FVNAME FDNAME
                     | """
-    p[0] = FeaturePair(p[1],p[2])
+    p[0] = elements.FeaturePair(p[1],p[2])
     featval.setdefault(p[1])
     featdim.setdefault(p[2])
 
@@ -183,7 +179,7 @@ def p_structurebase(p):
     """structurebase : STRUCTURE NAME
                         | STRUCTURE STRNAME"""
     if not structures.has_key(p[2]):
-        structures[p[2]] = Structure(p[2])
+        structures[p[2]] = elements.Structure(p[2])
     p[0] = p[2]
 
 def p_structure_statement(p):
@@ -208,9 +204,8 @@ def p_role(p):
 
 def p_compare_objects(p):
     """statement : COMPARE '(' STRNAME ',' STRNAME ')'"""
-    global params
     global outputSettings
-    find_similarity(structures[p[3]],structures[p[5]],dict(objects),params, outputSettings)
+    mapper.find_similarity(structures[p[3]],structures[p[5]],dict(objects), outputSettings)
 
 def p_error(p):
     if p:
@@ -267,16 +262,23 @@ def p_quit(p):
     sys.exit()
     
 def p_set(p): #I should be able to add a more specific name list with relative ease, afaik
-    """statement : SET PARNAME NUMBER"""
-    print p[0]
-    print p[1]
-    print p[2]
-    print (p[3]==1)
-    params[p[2]]=p[3]
-    print params
-    print mapper.params
+    """statement : SET setplus"""
+    for element in p[2]:
+        mapper.mapperParams[element[0]]= element[1]
     
-    
+def p_setplus(p):
+    """setplus : setbase ',' setplus
+                    | setbase"""
+    if(len(p)==2):
+        p[0] = [p[1]]
+    else:
+        p[0] = [p[1]] + p[3]
+        
+def p_setbase(p):
+    """setbase : PARNAME NUMBER"""
+    if not structures.has_key(p[2]):
+        structures[p[2]] = elements.Structure(p[2])
+    p[0] = [p[1],p[2]]
     
 def command(command):
     import ply.yacc as yacc
@@ -288,12 +290,11 @@ def induce(fileIn, paramsIn={}, settingsIn={}):
     import ply.yacc as yacc
     yacc.yacc()
     
-    global params
     global outputSettings
     
     if(paramsIn!={}):
         for key in paramsIn.keys():
-            params[key] = paramsIn[key]
+            mapper.mapperParams[key] = paramsIn[key]
             
     if(paramsIn!={}):
         for key in settingsIn.keys():
@@ -309,11 +310,10 @@ def induce(fileIn, paramsIn={}, settingsIn={}):
 def terminal():
     # Define a dictionary: a default set of stuff to do with one keypress
     opts, detupler = getopt.getopt(sys.argv[1:], "nhmgl:r:s:", ["node", "hist",\
-    "match", "gen", "learningrate=", "rounds=", "salience="])
+    "match", "gen", "learningrate=", "rounds="])
     
     global outputSettings
-    global params
-    
+
     for o,a in opts:
         if o in ("-n", "--node"):
             outputSettings['node'] = True
@@ -325,13 +325,10 @@ def terminal():
             outputSettings['gen'] = True
         if o in ("-l","--learningrate"):
             #print "new learning rate is " + a
-            params['L'] = float(a)
+            mapper.mapperParams['l'] = float(a)
         if o in ("-r","--rounds"):
             #print "new settle rate is " + a
-            params['R'] = int(a)
-        if o in ("-s","--salience"):
-            #print "new salience is " + a
-            params['S'] = float(a)
+            mapper.mapperParams['r'] = int(a)
     
     import ply.yacc as yacc
     yacc.yacc()

@@ -3,7 +3,7 @@ if(Sys.info()["user"]=="dlandy"){
   Windows <- FALSE
 } else {
   if(Sys.info()["sysname"]=="Windows"){
-    setwd("C:\\Users\\Gage\\Desktop\\Pyam\\pyam_0_1")
+    setwd("C:\\Users\\Gage\\Documents\\GitHub\\Pyam\\pyam_0_1")
     Windows <- TRUE 
   }else{
     setwd("/Users/gageholden/Desktop/Pyam/pyam_0_1")

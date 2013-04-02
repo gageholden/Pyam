@@ -1,27 +1,42 @@
-from elements import *
+import elements
 
-params = {'L':1, 'S':1, 'R':5}
+mapperParams = {
+    'l':1,      #learning rate
+    'r':5,      #number of iterations
+    'fif': 1,   #weight of inconsistent feature-to-feature nodes on each other. Default = 1
+    'fcf': 1,	#weight of consistent feature-to-feature nodes on each other. Default = 1
+    'oio': 1,	#weight of inconsistent object-to-object ndoes on each other. Default = 1
+    'oco': 1,	#weight of consistent object-to-object nodes on each other. Default = 1
+    'rir': 1,	#weight of inconsistent role-to-role nodes on each other. Default = 1
+    'rcr': 1,	#weight of consistent role-to-role nodes on each other. Default = 1
+    'ocf': 1,	#weight of object-to-object node on a consistent feature-to-feature node. Default = 1
+    'fco': 1,	#weight of feature-to-feature node on a consistent object-to-object node. Default = 1
+    'ocr': 1,	#weight of object-to-object node on a consistent role-to-role node. Default = 1
+    'rco': 1,	#weight of role-to-role node on a consistent object-to-object node. Default = 1
+    'alpha':1
+    }
+
 outputSettings = {'node':False, 'hist':False, 'match':False, 'gen':False}
 
-def find_similarity(struct1, struct2,objects, paramsIn = {}, settingsIn = {}):
-    global params
+def find_similarity(struct1, struct2,objects, settingsIn = {}):
+    global mapperParams
     global outputSettings
     
-    params = paramsIn
+    elements.elementParams = mapperParams
     outputSettings = settingsIn
     
     nodelist = make_nodes(struct1,struct2,objects)
     identifyconsistentnodes(nodelist)
     if outputSettings['node']:
         for i in range(len(nodelist)):
-            if isinstance(nodelist[i],FeatureNode):
+            if isinstance(nodelist[i],elements.FeatureNode):
                 print "Feat", str(i)
                 print struct1.name,nodelist[i].owner_one,nodelist[i].name_one,\
                 "|",struct2.name, nodelist[i].owner_two,nodelist[i].name_two
                 print "consistent: Obj",nodelist[i].con[0],\
                 "Feat",nodelist[i].con[1]
                 print "inconsistent: Feat",nodelist[i].inc
-            elif isinstance(nodelist[i],ObjectNode):
+            elif isinstance(nodelist[i],elements.ObjectNode):
                 print "Obj", str(i)
                 print struct1.name,nodelist[i].name_one,"|",struct2.name,\
                 nodelist[i].name_two
@@ -42,6 +57,7 @@ def find_similarity(struct1, struct2,objects, paramsIn = {}, settingsIn = {}):
     calculateFinalSimilarity(settledValues, nodelist)
 
 def calculateFinalSimilarity(valueList, nodelist):
+    global mapperParams
     topSum = 0
     botSum = 0
     
@@ -55,15 +71,18 @@ def calculateFinalSimilarity(valueList, nodelist):
             topSum = topSum + (node.matchvalue*value*1)
             botSum = botSum + (value*1)
     #print "Similarity: " + str(topSum/botSum)
-    if(not topSum==0):
-        print topSum/botSum
-    else:
-        print 0
+    
+    finalSum = (1-mapperParams['alpha'])*topSum;
+    if(not botSum==0):
+        finalSum+=mapperParams['alpha']*(topSum/botSum)
+
+    print finalSum
 
 def make_nodes(struct1, struct2, objects):
+    '''Generates every possible (logical) node in the SIAM style.'''
+
     global outputSettings
     
-    '''Generates every possible (logical) node in the SIAM style.'''
     rolelist = []
     objlist = []
     featlist = []
@@ -79,15 +98,14 @@ def make_nodes(struct1, struct2, objects):
         str1role, str1obj = x
         str2role, str2obj = y
 
-        #IFOUNDYOUROLENODESLANDYTURNEDOFFARG
-        rolelist.append(RoleNode(str1role,str2role,str1obj,str2obj))
-        objlist.append(ObjectNode(str1obj,str2obj,str1role,str2role))
+        rolelist.append(elements.RoleNode(str1role,str2role,str1obj,str2obj))
+        objlist.append(elements.ObjectNode(str1obj,str2obj,str1role,str2role))
         if outputSettings['gen']:print_now("*")
         if outputSettings['gen']:print_now("*")
         for a,b in [(a,b) for a in objects[str1obj].featurelist\
         for b in objects[str2obj].featurelist]:
             if a.dimension == b.dimension:
-                featlist.append(FeatureNode(a.dimension, a.value, b.value,
+                featlist.append(elements.FeatureNode(a.dimension, a.value, b.value,
                 str1obj,str2obj))
                 if outputSettings['gen']: print_now("*")
 
@@ -107,27 +125,26 @@ def identifyconsistentnodes(nodelist = []):
     if outputSettings['gen']:print "\nConsistencies Identified.\n"
 
 def excitenodes(nodelist):
-    global params
+    global mapperParams
     global outputSettings
     
     from array import array
     from itertools import repeat
     if outputSettings['hist'] == True:
         layerhistory = []
-    settling = True
-    prev_layer = array('d',repeat(0.5,len(nodelist)))
-    match_val = array('h',[x.matchvalue for x in nodelist])
-    if outputSettings['hist'] == True:
-        layerhistory.append(array('d',prev_layer))
-    newlayer = array('d')
-    if outputSettings['hist'] == True:
-        print "Match Values: " + match_val.__str__()
 
-    for round in range(params['R']):
-        newlayer = array('d',[excite(x,prev_layer,match_val) for x in nodelist])
+    if outputSettings['hist'] == True:
+        layerhistory.append(array('d',[x.prev for x in nodelist]))
+
+    if outputSettings['hist'] == True:
+        print "Match Values: " + array('d',[x.matchvalue for x in nodelist])
+
+    for round in range(int(mapperParams['r'])):
+        newlayer = array('d',[excite(x,nodelist) for x in nodelist])
         #check if newlayer is settled
-        prev_layer = newlayer
-        settling = False
+        for node,value in zip(nodelist,newlayer):
+            node.prev = value
+
         if outputSettings['hist'] == True:
             layerhistory.append(array('d',newlayer))
         if outputSettings['gen'] == True:
@@ -144,44 +161,43 @@ def excitenodes(nodelist):
             for i in range(len(layerhistory[layer])):
                 print_now("(" + str(i) + ": "+ ("%.3f" % layerhistory[layer][i]) + ") ")
             print
-    return prev_layer
+    return newlayer
 
-#str(round(layerhistory[layer][i],5))
 
-def excite(node, value, matchvalue):
+def excite(node, nodelist):
     global outputSettings
-    global params
-    L = params['L']
-        
+    global mapperParams
+    L = mapperParams['l']
     
     if outputSettings['match']: print "Updating Node " + str(node.index)
-    Ai = value[node.index]
+    Ai = node.prev
     sum_top = 0
     sum_bot = 0
     for nd in node.simpcon:
-        Aj = value[nd]
+        Aj = nodelist[nd].prev
         if Aj >= 0.5:
             Rji = Ai + (1-Ai)*(Aj-0.5)
         else: Rji = Ai - Ai*(0.5-Aj)
-        delta = Rji     # * matchvalue[nd]
+        weight = determineWeight(node.type,nodelist[nd].type,isConsistent=True)
+        delta = Rji * weight
         sum_top += delta
-        sum_bot += 1
+        sum_bot += 1 * weight
         if outputSettings['match']: print "  Getting " + str(delta) + " from node " + str(nd)
     for nd in node.inc:
-        Aj = value[nd]
+        Aj = nodelist[nd].prev
         if (1-Aj) >= 0.5:
             Rji = Ai+(1-Ai)*((1-Aj) - 0.5)
         else: Rji = Ai - Ai*(0.5-(1-Aj))
-        weight = determineWeight()
-        delta = Rji # * weight
+        weight = determineWeight(node.type,nodelist[nd].type,isConsistent=False)
+        delta = Rji * weight
         sum_top += delta
-        sum_bot += 1 # * weight
+        sum_bot += 1 * weight
         if outputSettings['match']: print "  Losing  " + str(delta) + " from node " + str(nd)
     # Of course, features might match
     if(node.type == "Feature" or node.type=="Role"):
-        sum_top += Ai + (1-Ai)*(matchvalue[node.index]-0.5)
+        sum_top += Ai + (1-Ai)*(node.matchvalue-0.5)
         sum_bot += 1
-        if outputSettings['match']: print "  Getting " + str(matchvalue[node.index]) + " from matchvalue"
+        if outputSettings['match']: print "  Getting " + str(node.matchvalue) + " from matchvalue"
     
 
     Mi = sum_top/sum_bot
@@ -190,5 +206,17 @@ def excite(node, value, matchvalue):
     if returnable < 0: return 0
     return returnable
 
-def determineWeight():
-    return
+def determineWeight(typeOne, typeTwo, isConsistent):
+    global mapperParams
+    global doublecheck
+    consistent = None
+    
+    if isConsistent:
+        consistent = 'c'
+    elif not isConsistent:
+        consistent = 'i'
+        
+    try:
+        return mapperParams[typeTwo[0].lower() + consistent + typeOne[0].lower()];
+    except:
+        return "I HAVE CRASHED IN DETERMINE WEIGHT SINCE YOU DIDNT PUT A ZERO HERE LIKE YOU PROBABLY SHOULD HAVE"
