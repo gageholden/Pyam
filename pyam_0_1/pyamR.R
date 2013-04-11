@@ -12,18 +12,11 @@ if(Sys.info()["user"]=="dlandy"){
 }
 require(plyr)
 
-inducePyam <- function(pyamScript,parameterString=""){
-
-#inducePyam <- function(pyamScript,L=0.5,R=5,S=1){
-  induce <- "python ./Induce.py"
-#  test <- paste(unlist(pyamScript), collapse="\n")
-  test <- pyamScript
-  command<-paste(induce,parameterString)
-  
-  system(command, intern = TRUE, input = test)
+inducePyam <- function(pyamScript){
+  system("python ./Induce.py", intern = TRUE, input = pyamScript)
 }
 
-fromCSV <- function(filename, start, end){
+fromCSV <- function(filename, start=-1, end=-1){
   library("rjson")
   
   command<-paste("python ./csvToPyam.py ", filename)
@@ -33,69 +26,83 @@ fromCSV <- function(filename, start, end){
   if(end != -1){
     command <- paste(command, " -e ", end)
   }
-  
+           
   json_file <- system(command,intern = TRUE)
-  json_data <- fromJSON(paste(json_file, collapse=""))
+  json_data <- ldply(fromJSON(paste(json_file, collapse="")), data.frame)
   json_data
 }
 
-fromPyam <- function(filename){
+runScriptFile <- function(filename){
   file <- read.delim(filename, sep = "\n", comment.char = "#", header = FALSE)
   inducePyam(file)
 }
 
-getSimilarity <- function(comparison,parameters){
-  run <- data.frame("metadata"=comparison$metadata,
-             "script"=paste(comparison$script, collapse="\n"))
-  run <- cbind(run,t(parameters),deparse.level=2)
-  parameterString <- paste("-",names(parameters)," ",parameters,sep="",collapse=" ")
-  run$similarity <- as.numeric(inducePyam(comparison[['script']],parameterString)[[1]])
-  run
+nameParameters <- function(parameters){
+  names(parameters)<-c(
+    'l',
+    'r',
+    'fif',
+    'fcf',
+    'oio',
+    'oco',
+    'rir',
+    'rcr',
+    'ocf',
+    'fco',
+    'ocr',
+    'rco',
+    'fmismatch',
+    'rmismatch',
+    'fwmatch',
+    'fwmis',
+    'rwmatch',
+    'rwmis'
+    )
+  parameters
 }
 
-similaritiesFromCSV <- function(filename,start=-1,end=-1,parametersIn){
-  comparisons <- fromCSV(filename, start,end)
-  comparisons <- (lapply(comparisons,getSimilarity, parameters=parametersIn))
-  comparisons
-}
-
-myTempFilename = "./data/StimuliLarkey_mips.csv"
-
-makeGraph <- function(comparisons,xAxis,yAxis,xMeta = FALSE, yMeta = FALSE){
-  if(yMeta && xMeta)
-    plot(cbind(lapply(comparisons,function(x){x$metadata[[xAxis]]}),lapply(comparisons,function(x){x$metadata[[yAxis]]})),xlab=xAxis,ylab=yAxis)
-  else if(xMeta)
-    plot(cbind(lapply(comparisons,function(x){x$metadata[[xAxis]]}),lapply(comparisons,function(x){x[[yAxis]]})),xlab=xAxis,ylab=yAxis)
-  else if(yMeta)
-    plot(cbind(lapply(comparisons,function(x){x[[xAxis]]}),lapply(comparisons,function(x){x$metadata[[yAxis]]})),xlab=xAxis,ylab=yAxis)
-  else
-    plot(cbind(lapply(comparisons,function(x){x[[xAxis]]}),lapply(comparisons,function(x){x[[yAxis]]})),xlab=xAxis,ylab=yAxis)
-}
-
-#getData <- function(){
-# ldply(unlist(lapply(1:5,function(x){similaritiesFromCSV(myTempFilename,start=1,end=-1,parametersIn=list("r"=x, "l"=0.2))}),recursive = F),
-#       function(x){x})
-#}
-
-getData <- function(parameters,startIn=-1,endIn=-1){
-  if(ncol(parameters)==2){
-    param = expand.grid(parameters[[1]],parameters[[2]])
-    colnames(param)<-colnames(parameters)
-    ldply(
-      unlist(
-        apply(param,1,
-               function(x){similaritiesFromCSV(myTempFilename,start=startIn,end=endIn,parametersIn=x)}),
-        recursive = F),function(x){x})
+checkDifference <- function(parameters, humanData, comparisons){
+  parameters <- nameParameters(parameters)
+  print(parameters)
+  if(mean(parameters>=0)==1&parameters['fmismatch']<=1&parameters['rmismatch']<=1&parameters['l']<=1
+     &parameters['r']>=1){
+    comparisons<-appendSimilarities(comparisons,parameters)
+    differences<-abs(humanData$similarity-as.numeric(comparisons$similarity))
+    exp(mean(log(differences[differences!=0])))
   }else{
-    param = expand.grid(parameters[[1]],parameters[[2]],parameters[[3]])
-    colnames(param)<-colnames(parameters)
-    ldply(
-      unlist(
-        apply(param,1,
-              function(x){similaritiesFromCSV(myTempFilename,start=startIn,end=endIn,parametersIn=x)}),
-        recursive = F),function(x){x})
+    100000000000
   }
 }
 
-par = data.frame("r"=seq(10,10,by=1),"l"=seq(0.05,1,by=0.05))
-#LOOK AT colwise! plyr!
+appendSimilarities <- function(comparisons,parameters){
+  paramLine<-paste("set", paste(names(parameters),parameters,collapse=", "))
+  comparisons <- cbind(comparisons,t(parameters),deparse.level=2)
+  comparisons<-mutate(comparisons,script=paste(paramLine,script,sep="\n"))
+  ddply(.data=comparisons,c("script"), mutate, similarity = inducePyam(as.character(script)))
+}
+
+getSimilarities <- function(comparisons,parameters){
+  paramLine<-paste("set", paste(names(parameters),parameters,collapse=", "))
+  comparisons <- cbind(comparisons,t(parameters),deparse.level=2)
+  comparisons<-mutate(comparisons,script=paste(paramLine,script,sep="\n"))
+  comparisons<-ddply(.data=comparisons,c("script"), mutate, similarity = inducePyam(as.character(script)))
+  comparisons$similarity
+}
+
+makeGraph <- function(comparisons,xAxis,yAxis){
+    plot(cbind(lapply(comparisons,function(x){x[[xAxis]]}),lapply(comparisons,function(x){x[[yAxis]]})),xlab=xAxis,ylab=yAxis)
+}
+
+#These are the stimuli files that have to be read in
+sLarkey = fromCSV("./data/StimuliLarkey_stim.csv")
+#sPairs = fromCSV("./data/")
+#sTwo = fromCSV("./data/")
+
+#These are (I believe) the correct human data files
+hLarkey = read.csv("./data/ANA-Larkey.csv")
+hPairs = read.csv("./data/ANA-2-Timed.csv")
+hTwo = read.csv("./data/ANA-1.csv")
+
+hLarkey<-mutate(hLarkey,similarity = as.numeric(Rating)/10)
+#checkDifference(c(1,20,1,1,1,1,1,1,1,1,1,1,0,0,1,1,1,1),hLarkey,sLarkey)
+#optim(par=c(0.5,10,1,1,1,1,1,1,1,1,1,1,0,0,1,1,1,1), checkDifference, humanData=hLarkey, comparisons=sLarkey, control=list(parscale=c(1,20,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1), maxit=50), method="SANN")-> outSANN

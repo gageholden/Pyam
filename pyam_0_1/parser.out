@@ -42,13 +42,17 @@ Rule 30    statement -> GENERAL
 Rule 31    statement -> BRAIN
 Rule 32    statement -> CLEAR
 Rule 33    statement -> QUIT
-Rule 34    statement -> SET PARNAME NUMBER
+Rule 34    statement -> SET setplus
+Rule 35    setplus -> setbase , setplus
+Rule 36    setplus -> setbase
+Rule 37    setbase -> PARNAME NUMBER
+Rule 38    statement -> SHOWPARAMS
 
 Terminals, with rules where they appear
 
 (                    : 26
 )                    : 26
-,                    : 3 5 7 16 22 26
+,                    : 3 5 7 16 22 26 35
 BRAIN                : 31
 CLEAR                : 32
 COMMENT              : 1
@@ -64,13 +68,14 @@ IMPLIES              :
 MATCH                : 29
 NAME                 : 3 4 9 9 10 11 18 24 24 25
 NODEINFO             : 28
-NUMBER               : 34
+NUMBER               : 37
 OBJNAME              : 5 6 25
 OR                   : 
-PARNAME              : 34
+PARNAME              : 37
 PRINT_COMMENT        : 2
 QUIT                 : 33
 SET                  : 34
+SHOWPARAMS           : 38
 STRNAME              : 19 26 26
 STRUCTURE            : 18 19
 VAR                  : 
@@ -83,6 +88,8 @@ featurepairplus      : 7 14 15
 objectplus           : 3 5 14 15
 role                 : 22 23
 roleplus             : 20 21 22
+setbase              : 35 36
+setplus              : 34 35
 statement            : 0
 structurebase        : 16 17
 structureplus        : 16 20 21
@@ -108,7 +115,8 @@ state 0
     (31) statement -> . BRAIN
     (32) statement -> . CLEAR
     (33) statement -> . QUIT
-    (34) statement -> . SET PARNAME NUMBER
+    (34) statement -> . SET setplus
+    (38) statement -> . SHOWPARAMS
     (3) objectplus -> . NAME , objectplus
     (4) objectplus -> . NAME
     (5) objectplus -> . OBJNAME , objectplus
@@ -129,6 +137,7 @@ state 0
     CLEAR           shift and go to state 8
     QUIT            shift and go to state 12
     SET             shift and go to state 4
+    SHOWPARAMS      shift and go to state 19
     NAME            shift and go to state 14
     OBJNAME         shift and go to state 15
     STRUCTURE       shift and go to state 18
@@ -144,7 +153,7 @@ state 1
     (16) structureplus -> structurebase . , structureplus
     (17) structureplus -> structurebase .
 
-    ,               shift and go to state 19
+    ,               shift and go to state 20
     HAS             reduce using rule 17 (structureplus -> structurebase .)
     HAVE            reduce using rule 17 (structureplus -> structurebase .)
 
@@ -155,8 +164,8 @@ state 2
     (14) statement -> objectplus . HAS featurepairplus
     (15) statement -> objectplus . HAVE featurepairplus
 
-    HAS             shift and go to state 20
-    HAVE            shift and go to state 21
+    HAS             shift and go to state 21
+    HAVE            shift and go to state 22
 
 
 
@@ -170,11 +179,16 @@ state 3
 
 state 4
 
-    (34) statement -> SET . PARNAME NUMBER
+    (34) statement -> SET . setplus
+    (35) setplus -> . setbase , setplus
+    (36) setplus -> . setbase
+    (37) setbase -> . PARNAME NUMBER
 
-    PARNAME         shift and go to state 22
+    PARNAME         shift and go to state 25
 
 
+    setbase                        shift and go to state 23
+    setplus                        shift and go to state 24
 
 state 5
 
@@ -243,7 +257,7 @@ state 13
 
     (26) statement -> COMPARE . ( STRNAME , STRNAME )
 
-    (               shift and go to state 23
+    (               shift and go to state 26
 
 
 
@@ -252,7 +266,7 @@ state 14
     (3) objectplus -> NAME . , objectplus
     (4) objectplus -> NAME .
 
-    ,               shift and go to state 24
+    ,               shift and go to state 27
     HAS             reduce using rule 4 (objectplus -> NAME .)
     HAVE            reduce using rule 4 (objectplus -> NAME .)
 
@@ -263,7 +277,7 @@ state 15
     (5) objectplus -> OBJNAME . , objectplus
     (6) objectplus -> OBJNAME .
 
-    ,               shift and go to state 25
+    ,               shift and go to state 28
     HAS             reduce using rule 6 (objectplus -> OBJNAME .)
     HAVE            reduce using rule 6 (objectplus -> OBJNAME .)
 
@@ -282,8 +296,8 @@ state 17
     (20) statement -> structureplus . HAS roleplus
     (21) statement -> structureplus . HAVE roleplus
 
-    HAS             shift and go to state 26
-    HAVE            shift and go to state 27
+    HAS             shift and go to state 29
+    HAVE            shift and go to state 30
 
 
 
@@ -292,12 +306,20 @@ state 18
     (18) structurebase -> STRUCTURE . NAME
     (19) structurebase -> STRUCTURE . STRNAME
 
-    NAME            shift and go to state 29
-    STRNAME         shift and go to state 28
+    NAME            shift and go to state 32
+    STRNAME         shift and go to state 31
 
 
 
 state 19
+
+    (38) statement -> SHOWPARAMS .
+
+    $end            reduce using rule 38 (statement -> SHOWPARAMS .)
+
+
+
+state 20
 
     (16) structureplus -> structurebase , . structureplus
     (16) structureplus -> . structurebase , structureplus
@@ -308,10 +330,10 @@ state 19
     STRUCTURE       shift and go to state 18
 
 
-    structureplus                  shift and go to state 30
+    structureplus                  shift and go to state 33
     structurebase                  shift and go to state 1
 
-state 20
+state 21
 
     (14) statement -> objectplus HAS . featurepairplus
     (7) featurepairplus -> . featurepair , featurepairplus
@@ -322,16 +344,16 @@ state 20
     (12) featurepair -> . FVNAME FDNAME
     (13) featurepair -> .
 
-    NAME            shift and go to state 32
-    FVNAME          shift and go to state 34
+    NAME            shift and go to state 35
+    FVNAME          shift and go to state 37
     ,               reduce using rule 13 (featurepair -> .)
     $end            reduce using rule 13 (featurepair -> .)
 
 
-    featurepairplus                shift and go to state 33
-    featurepair                    shift and go to state 31
+    featurepairplus                shift and go to state 36
+    featurepair                    shift and go to state 34
 
-state 21
+state 22
 
     (15) statement -> objectplus HAVE . featurepairplus
     (7) featurepairplus -> . featurepair , featurepairplus
@@ -342,32 +364,50 @@ state 21
     (12) featurepair -> . FVNAME FDNAME
     (13) featurepair -> .
 
-    NAME            shift and go to state 32
-    FVNAME          shift and go to state 34
+    NAME            shift and go to state 35
+    FVNAME          shift and go to state 37
     ,               reduce using rule 13 (featurepair -> .)
     $end            reduce using rule 13 (featurepair -> .)
 
 
-    featurepairplus                shift and go to state 35
-    featurepair                    shift and go to state 31
-
-state 22
-
-    (34) statement -> SET PARNAME . NUMBER
-
-    NUMBER          shift and go to state 36
-
-
+    featurepairplus                shift and go to state 38
+    featurepair                    shift and go to state 34
 
 state 23
 
-    (26) statement -> COMPARE ( . STRNAME , STRNAME )
+    (35) setplus -> setbase . , setplus
+    (36) setplus -> setbase .
 
-    STRNAME         shift and go to state 37
+    ,               shift and go to state 39
+    $end            reduce using rule 36 (setplus -> setbase .)
 
 
 
 state 24
+
+    (34) statement -> SET setplus .
+
+    $end            reduce using rule 34 (statement -> SET setplus .)
+
+
+
+state 25
+
+    (37) setbase -> PARNAME . NUMBER
+
+    NUMBER          shift and go to state 40
+
+
+
+state 26
+
+    (26) statement -> COMPARE ( . STRNAME , STRNAME )
+
+    STRNAME         shift and go to state 41
+
+
+
+state 27
 
     (3) objectplus -> NAME , . objectplus
     (3) objectplus -> . NAME , objectplus
@@ -379,9 +419,9 @@ state 24
     OBJNAME         shift and go to state 15
 
 
-    objectplus                     shift and go to state 38
+    objectplus                     shift and go to state 42
 
-state 25
+state 28
 
     (5) objectplus -> OBJNAME , . objectplus
     (3) objectplus -> . NAME , objectplus
@@ -393,9 +433,9 @@ state 25
     OBJNAME         shift and go to state 15
 
 
-    objectplus                     shift and go to state 39
+    objectplus                     shift and go to state 43
 
-state 26
+state 29
 
     (20) statement -> structureplus HAS . roleplus
     (22) roleplus -> . role , roleplus
@@ -403,13 +443,13 @@ state 26
     (24) role -> . NAME NAME
     (25) role -> . NAME OBJNAME
 
-    NAME            shift and go to state 40
+    NAME            shift and go to state 44
 
 
-    roleplus                       shift and go to state 41
-    role                           shift and go to state 42
+    roleplus                       shift and go to state 45
+    role                           shift and go to state 46
 
-state 27
+state 30
 
     (21) statement -> structureplus HAVE . roleplus
     (22) roleplus -> . role , roleplus
@@ -417,13 +457,13 @@ state 27
     (24) role -> . NAME NAME
     (25) role -> . NAME OBJNAME
 
-    NAME            shift and go to state 40
+    NAME            shift and go to state 44
 
 
-    roleplus                       shift and go to state 43
-    role                           shift and go to state 42
+    roleplus                       shift and go to state 47
+    role                           shift and go to state 46
 
-state 28
+state 31
 
     (19) structurebase -> STRUCTURE STRNAME .
 
@@ -433,7 +473,7 @@ state 28
 
 
 
-state 29
+state 32
 
     (18) structurebase -> STRUCTURE NAME .
 
@@ -443,7 +483,7 @@ state 29
 
 
 
-state 30
+state 33
 
     (16) structureplus -> structurebase , structureplus .
 
@@ -452,27 +492,27 @@ state 30
 
 
 
-state 31
+state 34
 
     (7) featurepairplus -> featurepair . , featurepairplus
     (8) featurepairplus -> featurepair .
 
-    ,               shift and go to state 44
+    ,               shift and go to state 48
     $end            reduce using rule 8 (featurepairplus -> featurepair .)
 
 
 
-state 32
+state 35
 
     (9) featurepair -> NAME . NAME
     (11) featurepair -> NAME . FDNAME
 
-    NAME            shift and go to state 45
-    FDNAME          shift and go to state 46
+    NAME            shift and go to state 49
+    FDNAME          shift and go to state 50
 
 
 
-state 33
+state 36
 
     (14) statement -> objectplus HAS featurepairplus .
 
@@ -480,17 +520,17 @@ state 33
 
 
 
-state 34
+state 37
 
     (10) featurepair -> FVNAME . NAME
     (12) featurepair -> FVNAME . FDNAME
 
-    NAME            shift and go to state 47
-    FDNAME          shift and go to state 48
+    NAME            shift and go to state 51
+    FDNAME          shift and go to state 52
 
 
 
-state 35
+state 38
 
     (15) statement -> objectplus HAVE featurepairplus .
 
@@ -498,23 +538,37 @@ state 35
 
 
 
-state 36
+state 39
 
-    (34) statement -> SET PARNAME NUMBER .
+    (35) setplus -> setbase , . setplus
+    (35) setplus -> . setbase , setplus
+    (36) setplus -> . setbase
+    (37) setbase -> . PARNAME NUMBER
 
-    $end            reduce using rule 34 (statement -> SET PARNAME NUMBER .)
+    PARNAME         shift and go to state 25
+
+
+    setbase                        shift and go to state 23
+    setplus                        shift and go to state 53
+
+state 40
+
+    (37) setbase -> PARNAME NUMBER .
+
+    ,               reduce using rule 37 (setbase -> PARNAME NUMBER .)
+    $end            reduce using rule 37 (setbase -> PARNAME NUMBER .)
 
 
 
-state 37
+state 41
 
     (26) statement -> COMPARE ( STRNAME . , STRNAME )
 
-    ,               shift and go to state 49
+    ,               shift and go to state 54
 
 
 
-state 38
+state 42
 
     (3) objectplus -> NAME , objectplus .
 
@@ -523,7 +577,7 @@ state 38
 
 
 
-state 39
+state 43
 
     (5) objectplus -> OBJNAME , objectplus .
 
@@ -532,17 +586,17 @@ state 39
 
 
 
-state 40
+state 44
 
     (24) role -> NAME . NAME
     (25) role -> NAME . OBJNAME
 
-    NAME            shift and go to state 50
-    OBJNAME         shift and go to state 51
+    NAME            shift and go to state 55
+    OBJNAME         shift and go to state 56
 
 
 
-state 41
+state 45
 
     (20) statement -> structureplus HAS roleplus .
 
@@ -550,17 +604,17 @@ state 41
 
 
 
-state 42
+state 46
 
     (22) roleplus -> role . , roleplus
     (23) roleplus -> role .
 
-    ,               shift and go to state 52
+    ,               shift and go to state 57
     $end            reduce using rule 23 (roleplus -> role .)
 
 
 
-state 43
+state 47
 
     (21) statement -> structureplus HAVE roleplus .
 
@@ -568,7 +622,7 @@ state 43
 
 
 
-state 44
+state 48
 
     (7) featurepairplus -> featurepair , . featurepairplus
     (7) featurepairplus -> . featurepair , featurepairplus
@@ -579,16 +633,16 @@ state 44
     (12) featurepair -> . FVNAME FDNAME
     (13) featurepair -> .
 
-    NAME            shift and go to state 32
-    FVNAME          shift and go to state 34
+    NAME            shift and go to state 35
+    FVNAME          shift and go to state 37
     ,               reduce using rule 13 (featurepair -> .)
     $end            reduce using rule 13 (featurepair -> .)
 
 
-    featurepair                    shift and go to state 31
-    featurepairplus                shift and go to state 53
+    featurepair                    shift and go to state 34
+    featurepairplus                shift and go to state 58
 
-state 45
+state 49
 
     (9) featurepair -> NAME NAME .
 
@@ -597,7 +651,7 @@ state 45
 
 
 
-state 46
+state 50
 
     (11) featurepair -> NAME FDNAME .
 
@@ -606,7 +660,7 @@ state 46
 
 
 
-state 47
+state 51
 
     (10) featurepair -> FVNAME NAME .
 
@@ -615,7 +669,7 @@ state 47
 
 
 
-state 48
+state 52
 
     (12) featurepair -> FVNAME FDNAME .
 
@@ -624,15 +678,23 @@ state 48
 
 
 
-state 49
+state 53
+
+    (35) setplus -> setbase , setplus .
+
+    $end            reduce using rule 35 (setplus -> setbase , setplus .)
+
+
+
+state 54
 
     (26) statement -> COMPARE ( STRNAME , . STRNAME )
 
-    STRNAME         shift and go to state 54
+    STRNAME         shift and go to state 59
 
 
 
-state 50
+state 55
 
     (24) role -> NAME NAME .
 
@@ -641,7 +703,7 @@ state 50
 
 
 
-state 51
+state 56
 
     (25) role -> NAME OBJNAME .
 
@@ -650,7 +712,7 @@ state 51
 
 
 
-state 52
+state 57
 
     (22) roleplus -> role , . roleplus
     (22) roleplus -> . role , roleplus
@@ -658,13 +720,13 @@ state 52
     (24) role -> . NAME NAME
     (25) role -> . NAME OBJNAME
 
-    NAME            shift and go to state 40
+    NAME            shift and go to state 44
 
 
-    roleplus                       shift and go to state 55
-    role                           shift and go to state 42
+    roleplus                       shift and go to state 60
+    role                           shift and go to state 46
 
-state 53
+state 58
 
     (7) featurepairplus -> featurepair , featurepairplus .
 
@@ -672,15 +734,15 @@ state 53
 
 
 
-state 54
+state 59
 
     (26) statement -> COMPARE ( STRNAME , STRNAME . )
 
-    )               shift and go to state 56
+    )               shift and go to state 61
 
 
 
-state 55
+state 60
 
     (22) roleplus -> role , roleplus .
 
@@ -688,7 +750,7 @@ state 55
 
 
 
-state 56
+state 61
 
     (26) statement -> COMPARE ( STRNAME , STRNAME ) .
 

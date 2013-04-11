@@ -4,9 +4,9 @@
 
 _lr_method = 'LALR'
 
-_lr_signature = 'X=\xbdM\x8e}\xaa\xe5hX\xc186\xd7\xd4\x16'
+_lr_signature = '\t\x16b\x95w\x1d\xae\xe1\xf7\xab<\x9b\xd6HbW'
 
-_lr_action_items = {'NODEINFO':([0,],[16,]),'FVNAME':([20,21,47,],[36,36,36,]),'NUMBER':([24,],[39,]),'HAVE':([1,2,14,15,17,30,31,32,41,42,],[-17,21,-4,-6,29,-19,-18,-16,-3,-5,]),'COMMENT':([0,],[3,]),'SET':([0,],[4,]),'FDNAME':([34,36,],[49,51,]),')':([58,],[60,]),'(':([13,],[25,]),',':([1,14,15,20,21,22,30,31,33,39,40,45,47,48,49,50,51,54,55,],[19,26,27,-13,-13,38,-19,-18,47,-37,53,56,-13,-9,-11,-10,-12,-24,-25,]),'GENERAL':([0,],[5,]),'BRAIN':([0,],[6,]),'STRNAME':([18,25,53,],[30,40,58,]),'PARNAME':([4,38,],[24,24,]),'CLEAR':([0,],[8,]),'PRINT_COMMENT':([0,],[9,]),'HAS':([1,2,14,15,17,30,31,32,41,42,],[-17,20,-4,-6,28,-19,-18,-16,-3,-5,]),'MATCH':([0,],[10,]),'HISTORY':([0,],[11,]),'QUIT':([0,],[12,]),'COMPARE':([0,],[13,]),'NAME':([0,18,20,21,26,27,28,29,34,36,43,47,56,],[14,31,34,34,14,14,43,43,48,50,54,34,43,]),'OBJNAME':([0,26,27,43,],[15,15,15,55,]),'$end':([3,5,6,7,8,9,10,11,12,16,20,21,22,23,33,35,37,39,44,45,46,47,48,49,50,51,52,54,55,57,59,60,],[-1,-30,-31,0,-32,-2,-29,-27,-33,-28,-13,-13,-36,-34,-8,-14,-15,-37,-20,-23,-21,-13,-9,-11,-10,-12,-35,-24,-25,-7,-22,-26,]),'STRUCTURE':([0,19,],[18,18,]),}
+_lr_action_items = {'NODEINFO':([0,],[16,]),'FVNAME':([21,22,48,],[37,37,37,]),'NUMBER':([25,],[40,]),'HAVE':([1,2,14,15,17,31,32,33,42,43,],[-17,22,-4,-6,30,-19,-18,-16,-3,-5,]),'COMMENT':([0,],[3,]),'SET':([0,],[4,]),'FDNAME':([35,37,],[50,52,]),')':([59,],[61,]),'(':([13,],[26,]),',':([1,14,15,21,22,23,31,32,34,40,41,46,48,49,50,51,52,55,56,],[20,27,28,-13,-13,39,-19,-18,48,-37,54,57,-13,-9,-11,-10,-12,-24,-25,]),'GENERAL':([0,],[5,]),'BRAIN':([0,],[6,]),'STRNAME':([18,26,54,],[31,41,59,]),'PARNAME':([4,39,],[25,25,]),'CLEAR':([0,],[8,]),'PRINT_COMMENT':([0,],[9,]),'HAS':([1,2,14,15,17,31,32,33,42,43,],[-17,21,-4,-6,29,-19,-18,-16,-3,-5,]),'MATCH':([0,],[10,]),'HISTORY':([0,],[11,]),'QUIT':([0,],[12,]),'COMPARE':([0,],[13,]),'NAME':([0,18,21,22,27,28,29,30,35,37,44,48,57,],[14,32,35,35,14,14,44,44,49,51,55,35,44,]),'OBJNAME':([0,27,28,44,],[15,15,15,56,]),'$end':([3,5,6,7,8,9,10,11,12,16,19,21,22,23,24,34,36,38,40,45,46,47,48,49,50,51,52,53,55,56,58,60,61,],[-1,-30,-31,0,-32,-2,-29,-27,-33,-28,-38,-13,-13,-36,-34,-8,-14,-15,-37,-20,-23,-21,-13,-9,-11,-10,-12,-35,-24,-25,-7,-22,-26,]),'STRUCTURE':([0,20,],[18,18,]),'SHOWPARAMS':([0,],[19,]),}
 
 _lr_action = { }
 for _k, _v in _lr_action_items.items():
@@ -15,7 +15,7 @@ for _k, _v in _lr_action_items.items():
       _lr_action[_x][_k] = _y
 del _lr_action_items
 
-_lr_goto_items = {'featurepair':([20,21,47,],[33,33,33,]),'structurebase':([0,19,],[1,1,]),'roleplus':([28,29,56,],[44,46,59,]),'featurepairplus':([20,21,47,],[35,37,57,]),'setbase':([4,38,],[22,22,]),'objectplus':([0,26,27,],[2,41,42,]),'role':([28,29,56,],[45,45,45,]),'statement':([0,],[7,]),'setplus':([4,38,],[23,52,]),'structureplus':([0,19,],[17,32,]),}
+_lr_goto_items = {'featurepair':([21,22,48,],[34,34,34,]),'structurebase':([0,20,],[1,1,]),'roleplus':([29,30,57,],[45,47,60,]),'featurepairplus':([21,22,48,],[36,38,58,]),'setbase':([4,39,],[23,23,]),'objectplus':([0,27,28,],[2,42,43,]),'role':([29,30,57,],[46,46,46,]),'statement':([0,],[7,]),'setplus':([4,39,],[24,53,]),'structureplus':([0,20,],[17,33,]),}
 
 _lr_goto = { }
 for _k, _v in _lr_goto_items.items():
@@ -25,41 +25,42 @@ for _k, _v in _lr_goto_items.items():
 del _lr_goto_items
 _lr_productions = [
   ("S'",1,None,None,None),
-  ('statement',1,'p_statement_comment','./Induce.py',124),
-  ('statement',1,'p_statement_print_comment','./Induce.py',129),
-  ('objectplus',3,'p_objectplus','./Induce.py',134),
-  ('objectplus',1,'p_objectplus','./Induce.py',135),
-  ('objectplus',3,'p_objectplus','./Induce.py',136),
-  ('objectplus',1,'p_objectplus','./Induce.py',137),
-  ('featurepairplus',3,'p_featurepairplus','./Induce.py',148),
-  ('featurepairplus',1,'p_featurepairplus','./Induce.py',149),
-  ('featurepair',2,'p_featurepair','./Induce.py',156),
-  ('featurepair',2,'p_featurepair','./Induce.py',157),
-  ('featurepair',2,'p_featurepair','./Induce.py',158),
-  ('featurepair',2,'p_featurepair','./Induce.py',159),
-  ('featurepair',0,'p_featurepair','./Induce.py',160),
-  ('statement',3,'p_statement','./Induce.py',166),
-  ('statement',3,'p_statement','./Induce.py',167),
-  ('structureplus',3,'p_structureplus','./Induce.py',173),
-  ('structureplus',1,'p_structureplus','./Induce.py',174),
-  ('structurebase',2,'p_structurebase','./Induce.py',181),
-  ('structurebase',2,'p_structurebase','./Induce.py',182),
-  ('statement',3,'p_structure_statement','./Induce.py',188),
-  ('statement',3,'p_structure_statement','./Induce.py',189),
-  ('roleplus',3,'p_roleplus','./Induce.py',194),
-  ('roleplus',1,'p_roleplus','./Induce.py',195),
-  ('role',2,'p_role','./Induce.py',202),
-  ('role',2,'p_role','./Induce.py',203),
-  ('statement',6,'p_compare_objects','./Induce.py',208),
-  ('statement',1,'p_history','./Induce.py',219),
-  ('statement',1,'p_nodeinfo','./Induce.py',225),
-  ('statement',1,'p_match','./Induce.py',231),
-  ('statement',1,'p_general','./Induce.py',237),
-  ('statement',1,'p_brain','./Induce.py',243),
-  ('statement',1,'p_clear','./Induce.py',253),
-  ('statement',1,'p_quit','./Induce.py',263),
-  ('statement',2,'p_set','./Induce.py',267),
-  ('setplus',3,'p_setplus','./Induce.py',276),
-  ('setplus',1,'p_setplus','./Induce.py',277),
-  ('setbase',2,'p_setbase','./Induce.py',284),
+  ('statement',1,'p_statement_comment','Induce.py',123),
+  ('statement',1,'p_statement_print_comment','Induce.py',128),
+  ('objectplus',3,'p_objectplus','Induce.py',133),
+  ('objectplus',1,'p_objectplus','Induce.py',134),
+  ('objectplus',3,'p_objectplus','Induce.py',135),
+  ('objectplus',1,'p_objectplus','Induce.py',136),
+  ('featurepairplus',3,'p_featurepairplus','Induce.py',147),
+  ('featurepairplus',1,'p_featurepairplus','Induce.py',148),
+  ('featurepair',2,'p_featurepair','Induce.py',155),
+  ('featurepair',2,'p_featurepair','Induce.py',156),
+  ('featurepair',2,'p_featurepair','Induce.py',157),
+  ('featurepair',2,'p_featurepair','Induce.py',158),
+  ('featurepair',0,'p_featurepair','Induce.py',159),
+  ('statement',3,'p_statement','Induce.py',165),
+  ('statement',3,'p_statement','Induce.py',166),
+  ('structureplus',3,'p_structureplus','Induce.py',172),
+  ('structureplus',1,'p_structureplus','Induce.py',173),
+  ('structurebase',2,'p_structurebase','Induce.py',180),
+  ('structurebase',2,'p_structurebase','Induce.py',181),
+  ('statement',3,'p_structure_statement','Induce.py',187),
+  ('statement',3,'p_structure_statement','Induce.py',188),
+  ('roleplus',3,'p_roleplus','Induce.py',193),
+  ('roleplus',1,'p_roleplus','Induce.py',194),
+  ('role',2,'p_role','Induce.py',201),
+  ('role',2,'p_role','Induce.py',202),
+  ('statement',6,'p_compare_objects','Induce.py',207),
+  ('statement',1,'p_history','Induce.py',218),
+  ('statement',1,'p_nodeinfo','Induce.py',224),
+  ('statement',1,'p_match','Induce.py',230),
+  ('statement',1,'p_general','Induce.py',236),
+  ('statement',1,'p_brain','Induce.py',242),
+  ('statement',1,'p_clear','Induce.py',252),
+  ('statement',1,'p_quit','Induce.py',262),
+  ('statement',2,'p_set','Induce.py',266),
+  ('setplus',3,'p_setplus','Induce.py',271),
+  ('setplus',1,'p_setplus','Induce.py',272),
+  ('setbase',2,'p_setbase','Induce.py',279),
+  ('statement',1,'p_showparams','Induce.py',285),
 ]

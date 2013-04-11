@@ -16,7 +16,7 @@ def makeEnt(entity, name):
     return (" ".join(out))[:-1]
 
 def makeComparison(fieldnames,line):
-    comparison={'metadata':{'itemNumber':line['itemNumber'], 'block':line['block'],'type':line['type']}}
+    comparison={'itemNumber':line['itemNumber'], 'block':line['block'],'type':line['type']}
     #comparison={'itemNumber':line['itemNumber'], 'block':line['block'],'type':line['type']}
     script = []
     
@@ -28,7 +28,7 @@ def makeComparison(fieldnames,line):
     meta = False
     for field in fieldnames[3:]:
         if meta:
-            comparison['metadata'][field]=line[field]
+            comparison[field]=line[field]
             #comparison[field]=line[field]
         else:
             if field in entity or field == 'line':
@@ -74,9 +74,11 @@ def parseFile(filename,start=-1,end=-1):
     pyam_comparisons =[]
     for item in reader:
         if int(item['itemNumber']) >= start and (end == -1 or int(item['itemNumber']) <=end):
-            pyam_comparisons.append(makeComparison(fieldnames,item))
-            
-    return json.dumps(pyam_comparisons)
+            comparison = makeComparison(fieldnames,item)
+            comparison['script'] = '\n'.join(comparison['script'])
+            pyam_comparisons.append(comparison)
+
+    return json.dumps(pyam_comparisons).replace("},","},\n")
 
 def parseFiles(filenames,start=-1,end=-1):
     pyam_per_file = {}

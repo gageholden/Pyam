@@ -32,7 +32,8 @@ reserved = {
         'nodeinfo' : 'NODEINFO',
         'match' : 'MATCH',
         'general' : 'GENERAL',
-        'set' : 'SET'        
+        'set' : 'SET',
+        'showparams': 'SHOWPARAMS'
     }
 
 tokens = ['NAME','OBJNAME','STRNAME','FVNAME','FDNAME','NUMBER', 'EQUALS', 'IMPLIES', 'OR', 'VAR', 'COMMENT',
@@ -279,6 +280,12 @@ def p_setbase(p):
     if not structures.has_key(p[2]):
         structures[p[2]] = elements.Structure(p[2])
     p[0] = [p[1],p[2]]
+    
+def p_showparams(p):
+    """statement : SHOWPARAMS"""
+    print mapper.mapperParams
+    for key, value in mapper.paramDetails.iteritems():
+        print "{0}: {1}".format(key,value)
     
 def command(command):
     import ply.yacc as yacc

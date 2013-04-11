@@ -13,8 +13,37 @@ mapperParams = {
     'fco': 1,	#weight of feature-to-feature node on a consistent object-to-object node. Default = 1
     'ocr': 1,	#weight of object-to-object node on a consistent role-to-role node. Default = 1
     'rco': 1,	#weight of role-to-role node on a consistent object-to-object node. Default = 1
-    'alpha':1
+    'alpha':1,
+    'fmismatch':0,  #feature-mismatch-value = the match value (0-1) given to features that mismatch. Default = 0
+    'rmismatch':0,   #role-mismatch-value = the match value (0-1) given to roles that mismatch. Default = 0
+    'fwmatch':1,    #feature-match-wt = weight of a feature match on feature-to-feature node. Default = 1
+    'fwmis':1,    #feature-mismatch-wt = weight of a feature mismatch on feature-to-feature node. Default = 1
+    'rwmatch':1,    #role-match-wt = weight of a role match on role-to-role node. Default = 1
+    'rwmis':1    #role-mismatch-wt = weight of a role mismatch on role-to-role node. Default = 1
     }
+
+paramDetails = {
+    'l':"learning rate",
+    'r':"number of iterations",
+    'fif':"weight of inconsistent feature-to-feature nodes on each other. Default = 1",
+    'fcf':"weight of consistent feature-to-feature nodes on each other. Default = 1",
+    'oio':"weight of inconsistent object-to-object ndoes on each other. Default = 1",
+    'oco':"weight of consistent object-to-object nodes on each other. Default = 1",
+    'rir':"weight of inconsistent role-to-role nodes on each other. Default = 1",
+    'rcr':"weight of consistent role-to-role nodes on each other. Default = 1",
+    'ocf':"weight of object-to-object node on a consistent feature-to-feature node. Default = 1",
+    'fco':"weight of feature-to-feature node on a consistent object-to-object node. Default = 1",
+    'ocr':"weight of object-to-object node on a consistent role-to-role node. Default = 1",
+    'rco':"weight of role-to-role node on a consistent object-to-object node. Default = 1",
+    'alpha':"Determines whether the final similarity calculation is normalized. Default = 1",
+    'fmismatch':"feature-mismatch-value = the match value (0-1) given to features that mismatch. Default = 0",
+    'rmismatch':"role-mismatch-value = the match value (0-1) given to roles that mismatch. Default = 0",
+    
+    'fwmatch':"feature-match-wt = weight of a feature match on feature-to-feature node. Default = 1",
+    'fwmis':"feature-mismatch-wt = weight of a feature mismatch on feature-to-feature node. Default = 1",
+    'rwmatch':"role-match-wt = weight of a role match on role-to-role node. Default = 1",
+    'rwmis':"role-mismatch-wt = weight of a role mismatch on role-to-role node. Default = 1"
+}
 
 outputSettings = {'node':False, 'hist':False, 'match':False, 'gen':False}
 
@@ -194,10 +223,25 @@ def excite(node, nodelist):
         sum_bot += 1 * weight
         if outputSettings['match']: print "  Losing  " + str(delta) + " from node " + str(nd)
     # Of course, features might match
+    # SIAM paper pg 15 paragraph one first sentence comments on why this is here
     if(node.type == "Feature" or node.type=="Role"):
-        sum_top += Ai + (1-Ai)*(node.matchvalue-0.5)
-        sum_bot += 1
-        if outputSettings['match']: print "  Getting " + str(node.matchvalue) + " from matchvalue"
+        if node.matchvalue > 0.5:
+            Rji = Ai + (1-Ai)*(node.matchvalue-0.5)
+        else: Rji = Ai - Ai*(0.5-node.matchvalue)
+        
+        if node.type == "Role":
+            if node.matchvalue == 1:
+                weight = mapperParams['rwmatch']
+            else:
+                weight = mapperParams['rwmis']
+        else:
+            if node.matchvalue == 1:
+                weight = mapperParams['fwmatch']
+            else:
+                weight = mapperParams['fwmis']
+        sum_top += Rji * weight
+        sum_bot += 1 * weight
+        if outputSettings['match']: print "  Getting " + str(Rji * weight) + " from matchvalue"
     
 
     Mi = sum_top/sum_bot

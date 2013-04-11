@@ -90,7 +90,8 @@ class RoleNode:
         if name_one == name_two:
             self.matchvalue = 1
         else:
-            self.matchvalue = 0
+            global elementParams
+            self.matchvalue = elementParams['rmismatch']
 
     def identifyconsistencies(self, nodelist, step_val=-1):
         self.index = step_val
@@ -129,7 +130,8 @@ class ObjectNode:
         #All elements can only be inconsistent with themselves
         self.inc = []
         # David Landy changed the match value from 1 to 0, because he believes objects don't match
-        self.matchvalue = 0
+        # Gage commented this out because he doesn't think it is used at all, anyway
+        # self.matchvalue = 0
 
     def identifyconsistencies(self, nodelist, step_val=-1):
         self.index = step_val
@@ -167,7 +169,8 @@ class FeatureNode:
         if name_one == name_two:
             self.matchvalue = 1
         else:
-            self.matchvalue = 0
+            global elementParams
+            self.matchvalue = elementParams['fmismatch']
 
     def identifyconsistencies(self, nodelist, step_val=-1):
         self.index = step_val
