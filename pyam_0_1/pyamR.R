@@ -78,14 +78,14 @@ appendSimilarities <- function(comparisons,parameters){
   paramLine<-paste("set", paste(names(parameters),parameters,collapse=", "))
   comparisons <- cbind(comparisons,t(parameters),deparse.level=2)
   comparisons<-mutate(comparisons,script=paste(paramLine,script,sep="\n"))
-  ddply(.data=comparisons,c("script"), mutate, similarity = inducePyam(as.character(script)))
+  ddply(.data=comparisons,c("script"), mutate, similarity = as.numeric(inducePyam(as.character(script))))
 }
 
 getSimilarities <- function(comparisons,parameters){
   paramLine<-paste("set", paste(names(parameters),parameters,collapse=", "))
   comparisons <- cbind(comparisons,t(parameters),deparse.level=2)
   comparisons<-mutate(comparisons,script=paste(paramLine,script,sep="\n"))
-  comparisons<-ddply(.data=comparisons,c("script"), mutate, similarity = inducePyam(as.character(script)))
+  comparisons<-ddply(.data=comparisons,c("script"), mutate, similarity = as.numeric(inducePyam(as.character(script))))
   comparisons$similarity
 }
 
@@ -97,6 +97,7 @@ makeGraph <- function(comparisons,xAxis,yAxis){
 sLarkey = fromCSV("./data/StimuliLarkey_stim.csv")
 #sPairs = fromCSV("./data/")
 #sTwo = fromCSV("./data/")
+smLarkey = fromCSV("./data/StimuliLarkey_mips.csv")
 
 #These are (I believe) the correct human data files
 hLarkey = read.csv("./data/ANA-Larkey.csv")
@@ -106,3 +107,7 @@ hTwo = read.csv("./data/ANA-1.csv")
 hLarkey<-mutate(hLarkey,similarity = as.numeric(Rating)/10)
 #checkDifference(c(1,20,1,1,1,1,1,1,1,1,1,1,0,0,1,1,1,1),hLarkey,sLarkey)
 #optim(par=c(0.5,10,1,1,1,1,1,1,1,1,1,1,0,0,1,1,1,1), checkDifference, humanData=hLarkey, comparisons=sLarkey, control=list(parscale=c(1,20,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1), maxit=50), method="SANN")-> outSANN
+
+
+#mipsSim<-appendSimilarities(smLarkey,nameParameters(c(1,100,1,1,1,1,1,1,1,1,1,1,0,0,1,1,1,1)))
+#mipsSim[mipsSim$itemNumber==79,]$script;hLarkey[hLarkey$itemNumber==79,][1:5,]
