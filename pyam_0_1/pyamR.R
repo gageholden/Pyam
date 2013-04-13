@@ -67,7 +67,7 @@ checkDifference <- function(parameters, humanData, comparisons){
   if(mean(parameters>=0)==1&parameters['fmismatch']<=1&parameters['rmismatch']<=1&parameters['l']<=1
      &parameters['r']>=1){
     comparisons<-appendSimilarities(comparisons,parameters)
-    differences<-abs(humanData$similarity-as.numeric(comparisons$similarity))
+    differences<-abs(humanData$similarity[order(humanData$itemNumber)]-as.numeric(comparisons$similarity[order(comparisons$itemNumber)]))
     exp(mean(log(differences[differences!=0])))
   }else{
     100000000000
@@ -108,6 +108,19 @@ hLarkey<-mutate(hLarkey,similarity = as.numeric(Rating)/10)
 #checkDifference(c(1,20,1,1,1,1,1,1,1,1,1,1,0,0,1,1,1,1),hLarkey,sLarkey)
 #optim(par=c(0.5,10,1,1,1,1,1,1,1,1,1,1,0,0,1,1,1,1), checkDifference, humanData=hLarkey, comparisons=sLarkey, control=list(parscale=c(1,20,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1), maxit=50), method="SANN")-> outSANN
 
+hLarkey$Shape.method <- unlist(tapply(1:9, 1:9, function(x){rep(hLarkey$Color.method[x], 9)}) )
+hLarkey$Shape.method <- factor(hLarkey$Shape.method2, levels=c("AB","BA",    "AA", "BB", "AC", "CA",  "BC" , "CB", "CD"))
+hLarkey$Color.method <- factor(hLarkey$Color.method, levels=c("AB","BA",    "AA", "BB", "AC", "CA",  "BC" , "CB", "CD"))
+
+
+# Replication of Larkey & Markman:
+#with(hLarkey[hLarkey$Shape.method %in% c("AB", "BA"),], interaction.plot(Color.method, Shape.method, similarity))
+smLarkey  <- smLarkey[order(smLarkey$itemNumber),]
+smLarkey$Shape.method <- factor(tapply(as.character(hLarkey$Shape.method), hLarkey$itemNumber, unique), levels=c("AB","BA",    "AA", "BB", "AC", "CA",  "BC" , "CB", "CD"))
+smLarkey$Color.method <- factor(tapply(as.character(hLarkey$Color.method), hLarkey$itemNumber, unique), levels=c("AB","BA",    "AA", "BB", "AC", "CA",  "BC" , "CB", "CD"))
 
 #mipsSim<-appendSimilarities(smLarkey,nameParameters(c(1,100,1,1,1,1,1,1,1,1,1,1,0,0,1,1,1,1)))
 #mipsSim[mipsSim$itemNumber==79,]$script;hLarkey[hLarkey$itemNumber==79,][1:5,]
+
+# Larkey estimate for this person
+#with(mipsSim[mipsSim$Shape.method %in% c("AB", "BA"),], interaction.plot(Color.method, Shape.method, similarity))
