@@ -38,7 +38,6 @@ paramDetails = {
     'alpha':"Determines whether the final similarity calculation is normalized. Default = 1",
     'fmismatch':"feature-mismatch-value = the match value (0-1) given to features that mismatch. Default = 0",
     'rmismatch':"role-mismatch-value = the match value (0-1) given to roles that mismatch. Default = 0",
-    
     'fwmatch':"feature-match-wt = weight of a feature match on feature-to-feature node. Default = 1",
     'fwmis':"feature-mismatch-wt = weight of a feature mismatch on feature-to-feature node. Default = 1",
     'rwmatch':"role-match-wt = weight of a role match on role-to-role node. Default = 1",
@@ -47,7 +46,8 @@ paramDetails = {
 
 outputSettings = {'node':False, 'hist':False, 'match':False, 'gen':False}
 
-def find_similarity(struct1, struct2,objects, settingsIn = {}):
+def find_similarity(struct1, struct2, objects, settingsIn = {}):
+    '''This method initializes the process of finding similarity'''
     global mapperParams
     global outputSettings
     
@@ -86,6 +86,7 @@ def find_similarity(struct1, struct2,objects, settingsIn = {}):
     calculateFinalSimilarity(settledValues, nodelist)
 
 def calculateFinalSimilarity(valueList, nodelist):
+    '''Runs through the value list'''
     global mapperParams
     topSum = 0
     botSum = 0
@@ -108,7 +109,8 @@ def calculateFinalSimilarity(valueList, nodelist):
     print finalSum
 
 def make_nodes(struct1, struct2, objects):
-    '''Generates every possible (logical) node in the SIAM style.'''
+    '''Generates every possible (logical) node in the SIAM style.
+    Returns them in a list'''
 
     global outputSettings
     
@@ -154,6 +156,8 @@ def identifyconsistentnodes(nodelist = []):
     if outputSettings['gen']:print "\nConsistencies Identified.\n"
 
 def excitenodes(nodelist):
+    '''Updates the activation levels of every node in the nodelist and returns
+    a new "layer" of nodes (this avoids unintentional side effects)'''
     global mapperParams
     global outputSettings
     
@@ -166,7 +170,7 @@ def excitenodes(nodelist):
         layerhistory.append(array('d',[x.prev for x in nodelist]))
 
     if outputSettings['hist'] == True:
-        print "Match Values: " + array('d',[x.matchvalue for x in nodelist])
+        print "Match Values: " + array('d',[x.matchvalue for x in nodelist]).tostring()
 
     for round in range(int(mapperParams['r'])):
         newlayer = array('d',[excite(x,nodelist) for x in nodelist])
@@ -194,6 +198,7 @@ def excitenodes(nodelist):
 
 
 def excite(node, nodelist):
+    '''Return this node's activation according to the paper's specifications'''
     global outputSettings
     global mapperParams
     L = mapperParams['l']
@@ -251,6 +256,7 @@ def excite(node, nodelist):
     return returnable
 
 def determineWeight(typeOne, typeTwo, isConsistent):
+    '''Selects a weight variable based on the first letters of the node types.'''
     global mapperParams
     global doublecheck
     consistent = None
@@ -264,3 +270,9 @@ def determineWeight(typeOne, typeTwo, isConsistent):
         return mapperParams[typeTwo[0].lower() + consistent + typeOne[0].lower()];
     except:
         return "I HAVE CRASHED IN DETERMINE WEIGHT SINCE YOU DIDNT PUT A ZERO HERE LIKE YOU PROBABLY SHOULD HAVE"
+    
+def print_now(string):
+    import sys
+    '''Forces printing now rather than at a "new line"'''
+    sys.stdout.write(string)
+    sys.stdout.flush()

@@ -101,21 +101,11 @@ import ply.lex as lex
 lex.lex()
 
 # Parsing rules
-#low to high
+#low to high precendence
 precedence = (
     ('nonassoc', 'HAS', 'HAVE'),
-    #('nonassoc', 'TEST', 'QUERY', 'BRAIN', 'GIVEN'),
-    #('nonassoc', '<', '>'),
     ('left', ','),
     ('left', 'EQUALS'),
-    #('left','+','-'),
-    #('left', 'CAUSES'),
-    #('left', 'ISA'),
-    #('left', 'IMPLIES'),
-    #('left', 'OR'),
-    #('left', '^'),
-    #('left','*','/'),
-    #('right','UMINUS'),
     ('nonassoc', 'COMPARE')
     )
 
@@ -262,7 +252,7 @@ def p_quit(p):
     """statement : QUIT"""
     sys.exit()
     
-def p_set(p): #I should be able to add a more specific name list with relative ease, afaik
+def p_set(p):
     """statement : SET setplus"""
     for element in p[2]:
         mapper.mapperParams[element[0]]= element[1]
@@ -288,12 +278,15 @@ def p_showparams(p):
         print "{0}: {1}".format(key,value)
     
 def command(command):
+    '''Allows code that imports Induce.py to call specific commands'''
     import ply.yacc as yacc
     yacc.yacc()
     if not command.isspace():
         yacc.parse(command)
 
 def induce(fileIn, paramsIn={}, settingsIn={}):
+    '''Allows code that imports Induce.py to run pyam script files.
+    Can also set parameters and output settings.'''
     import ply.yacc as yacc
     yacc.yacc()
     
@@ -315,6 +308,9 @@ def induce(fileIn, paramsIn={}, settingsIn={}):
             line = fyle.readline()
 
 def terminal():
+    #This method handles what is performed when Induce is called from the terminal or main function
+    #The communication options are the key here
+    
     # Define a dictionary: a default set of stuff to do with one keypress
     opts, detupler = getopt.getopt(sys.argv[1:], "nhmgl:r:s:", ["node", "hist",\
     "match", "gen", "learningrate=", "rounds="])
@@ -330,12 +326,6 @@ def terminal():
             outputSettings['match'] = True
         if o in ("-g", "--gen"):
             outputSettings['gen'] = True
-        if o in ("-l","--learningrate"):
-            #print "new learning rate is " + a
-            mapper.mapperParams['l'] = float(a)
-        if o in ("-r","--rounds"):
-            #print "new settle rate is " + a
-            mapper.mapperParams['r'] = int(a)
     
     import ply.yacc as yacc
     yacc.yacc()
@@ -350,3 +340,9 @@ def terminal():
     
 if __name__ == "__main__":
     terminal()
+    
+def print_now(string):
+    import sys
+    '''Forces printing now rather than at a "new line"'''
+    sys.stdout.write(string)
+    sys.stdout.flush()

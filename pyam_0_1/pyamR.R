@@ -11,6 +11,7 @@ if(Sys.info()["user"]=="dlandy"){
   }
 }
 require(plyr)
+require(ggplot2)
 
 inducePyam <- function(pyamScript){
   system("python ./Induce.py", intern = TRUE, input = pyamScript)
@@ -145,6 +146,26 @@ checkDifferenceFast_fixed <- function(parameters, humanData, comparisons){
   }
 }
 
+checkDifferenceFast_fixed_broken <- function(parameters, humanData, comparisons){
+  parameters <- nameParameters_fixed(parameters)
+  parameters["r"] = 50
+  
+  #print(parameters)
+  #print(mean(parameters[names(parameters)!="r"]<=1)==1)
+  #steplist<<-rbind(steplist,parameters)
+  if(mean(parameters>=0)==1&parameters['fmismatch']<=1&parameters['rmismatch']<=1&parameters['l']<=1
+     &parameters['r']>=1&parameters['r']<=100&mean(parameters[names(parameters)!="r"]<=1)==1){
+    
+    
+    comparisons<-appendSimilaritiesFast(comparisons,parameters)
+    differences<-abs(arrange(humanData,itemNumber)$similarity-arrange(comparisons,itemNumber)$similarity)
+    #exp(mean(log(differences[differences!=0])))
+    sqrt(mean(differences^2))
+  }else{
+    100000000000
+  }
+}
+
 appendSimilaritiesFast <- function(comparisons,parameters){
   paramLine<-paste("set", paste(names(parameters),parameters,collapse=", "))
   comparisons <- cbind(comparisons,t(parameters),deparse.level=2)
@@ -223,6 +244,8 @@ dontStopBelieving <- function(sIDin){
   record<-append(nameParameters_fixed(record$par),c("r"=25,"value"=record$value,"sID"=sIDin))
   record
 }
+
+
 
 #mipsSim<-appendSimilarities(smLarkey,nameParameters(c(1,100,1,1,1,1,1,1,1,1,1,1,0,0,1,1,1,1)))
 #plot(hLarkey$itemNumber[hLarkey$sID==18], hLarkey$similarity[hLarkey$sID==18])

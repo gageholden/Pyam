@@ -72,6 +72,7 @@ class Structure:
         return ""
 
 class RoleNode:
+    '''This defines a role-to-role node based on SIAMs definition'''
     def __init__(self, name_one, name_two, obj_one, obj_two):
         self.type = "Role"
         self.prev = 0.5
@@ -82,10 +83,11 @@ class RoleNode:
         self.obj_two = obj_two
         #The pattern is role object
         self.con = [[],[]]
-        #All elements are only inconsistent with themselves.
+        #All elements are only inconsistent with their own type.
         self.inc = []
 
-        # DL changed the match values, since he thinks roles always match.
+        #Matching or not matching is always based on the "names" of the
+        #mapped elements
         self.matchvalue = 1
         if name_one == name_two:
             self.matchvalue = 1
@@ -94,12 +96,17 @@ class RoleNode:
             self.matchvalue = elementParams['rmismatch']
 
     def identifyconsistencies(self, nodelist, step_val=-1):
+        #step_val is used to avoid analyzing over the same nodes repeatedly
         self.index = step_val
+        
+        #This for loop runs through the entire node list in order to
+        #identify all possible consistencies and inconsistencies
         for i in range(len(nodelist) - step_val - 1):
             i = i + step_val + 1
             if isinstance(nodelist[i],RoleNode):
                 if (nodelist[i].name_one == self.name_one
                 or nodelist[i].name_two  == self.name_two):
+                    #if the nodes map any of the same roles, they are inconsistent
                     self.inc.append(i)
                     nodelist[i].inc.append(step_val)
                 else:
@@ -110,6 +117,8 @@ class RoleNode:
                     nodelist[i].name_one == self.obj_one and \
                     nodelist[i].role2 == self.name_two and \
                     nodelist[i].name_two == self.obj_two):
+                    #if the object node and role node map the same
+                    #objects and roles together they are consistent
                     self.con[1].append(i)
                     nodelist[i].con[0].append(step_val)
             else:
@@ -117,6 +126,7 @@ class RoleNode:
         self.simpcon = [item for sublist in self.con for item in sublist]
 
 class ObjectNode:
+    '''This defines and object-to-object node based on SIAMs definition'''
     def __init__(self, name_one, name_two, role1, role2):
         self.type = "Object"
         self.prev = 0.5
@@ -127,19 +137,23 @@ class ObjectNode:
         self.role2 = role2
         #the pattern is role, object, feature
         self.con = [[],[],[]]
-        #All elements can only be inconsistent with themselves
+        #All elements can only be inconsistent with their own type
         self.inc = []
-        # David Landy changed the match value from 1 to 0, because he believes objects don't match
-        # Gage commented this out because he doesn't think it is used at all, anyway
-        # self.matchvalue = 0
+        self.matchvalue = -1
 
     def identifyconsistencies(self, nodelist, step_val=-1):
+        #step_val is used to avoid analyzing over the same nodes repeatedly
         self.index = step_val
+        
+        #This for loop runs through the entire node list in order to
+        #identify all possible consistencies and inconsistencies
         for i in range(len(nodelist) - step_val - 1):
             i = i + step_val + 1
             if isinstance(nodelist[i],ObjectNode):
                 if (nodelist[i].role1 == self.role1
                 or nodelist[i].role2 == self.role2):
+                    #if the objects mapped have the same
+                    #role as the other obj-to-obj role they are inconsistent
                     self.inc.append(i)
                     nodelist[i].inc.append(step_val)
                 else:
@@ -148,11 +162,15 @@ class ObjectNode:
             elif isinstance(nodelist[i],FeatureNode) and\
             ((nodelist[i].owner_one == self.name_one and
             nodelist[i].owner_two == self.name_two)):
+                #A feature node is consistent if the feature to feature
+                #node maps features of the objects in this object to
+                #object node
                 self.con[2].append(i)
                 nodelist[i].con[0].append(step_val)
         self.simpcon = [item for sublist in self.con for item in sublist]
 
 class FeatureNode:
+    '''This defines and object-to-object node based on SIAMs definition'''
     def __init__(self, dimension, name_one, name_two, object_one, object_two):
         self.type = "Feature"
         self.prev = 0.5
@@ -164,8 +182,11 @@ class FeatureNode:
         self.dimension = dimension
         #the pattern is object, feature
         self.con = [[],[]]
-        #Elements are only inconsistent with themselves
+        #Elements are only inconsistent with their own type
         self.inc = []
+        
+        #Matching or not matching is always based on the "names" of the
+        #mapped elements
         if name_one == name_two:
             self.matchvalue = 1
         else:
@@ -173,13 +194,19 @@ class FeatureNode:
             self.matchvalue = elementParams['fmismatch']
 
     def identifyconsistencies(self, nodelist, step_val=-1):
+        #step_val is used to avoid analyzing over the same nodes repeatedly
         self.index = step_val
+        
+        #This for loop runs through the entire node list in order to
+        #identify all possible consistencies and inconsistencies
         for i in range(len(nodelist) - step_val - 1):
             i = i + step_val + 1
             if isinstance(nodelist[i],FeatureNode) and\
             nodelist[i].dimension == self.dimension:
                 if (nodelist[i].owner_one == self.owner_one
                 or nodelist[i].owner_two  == self.owner_two):
+                    #If the features mapped are the same then the feature
+                    #nodes are considered to be inconsistent
                     self.inc.append(i)
                     nodelist[i].inc.append(step_val)
                 else:
